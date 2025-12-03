@@ -1,14 +1,16 @@
-pipeline{
-    //agent{docker{ image "node:latest"}}
+pipeline {
     agent any
+
     environment {
-        IMAGE_NAME = "gopikrishna1338/currency-exchange-microservice"
-        IMAGE_TAG  = "latest"
+        IMAGE_NAME = 'gopikrishna1338/currency-exchange-microservice'
+        IMAGE_TAG  = 'latest'
     }
+
     tools {
         maven 'myMaven'
     }
-    stages{
+
+    stages {
         stage('Checkout') {
             steps {
                 checkout scm
@@ -19,33 +21,36 @@ pipeline{
 
         stage('Unit Tests') {
             steps {
-                sh 'mvn  test'
+                sh 'mvn test'
             }
         }
 
         stage('Integration Tests') {
             steps {
-                sh 'mvn  failsafe:integration-test  failsafe:verify'
+                sh 'mvn failsafe:integration-test failsafe:verify'
             }
         }
-        stage('Build'){
+
+        stage('Build') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
         }
-        stage('Build Docker Image'){
+
+        stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
-        stage('Push Docker Image'){
-            steps {
-                 script {
-                    docker.withRegistry('', 'dockerid') {
-                       sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                    }
-                 }
 
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerid') {
+                        sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    }
+                }
             }
         }
-    }
+    }   // ✅ closes stages
+}       // ✅ closes pipeline
