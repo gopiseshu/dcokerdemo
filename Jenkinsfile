@@ -15,13 +15,13 @@ pipeline{
 		
         stage('Build & Unit Tests') {
             steps {
-                sh 'mvn clean test'
+                sh 'mvn  test'
             }
         }
 
         stage('Integration Tests') {
             steps {
-                sh 'mvn verify'
+                sh 'mvn  failsafe:integration-test  failsafe:verify'
             }
         }
 	}
